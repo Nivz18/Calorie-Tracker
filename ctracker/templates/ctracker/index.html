@@ -1,0 +1,349 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+        <style>
+          body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color:black;
+          }
+      
+          .navbar {
+            background-color:grey;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo img {
+            width: 50px; /* Adjust as needed */
+            height: auto;
+            margin-right: 10px;
+            
+        }
+        
+        .logo span {
+            color:white;
+            font-size: 1.8rem;
+            
+        }
+        
+        .nav-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+        
+        .nav-list li {
+            margin-right: 20px;
+        }
+        
+        .nav-list a {
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+         
+          #form_data{
+            margin-top:15px;
+            height: 37px;
+            width: 258px;
+            margin-left:283px;
+          }
+          table {
+            width: 50%;
+            border-collapse: collapse;
+            margin: 20px;
+          }
+      
+          th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+          }
+      
+          th {
+            background-color:cyan;
+            color:black;
+            font-style:bold;
+          }
+      
+          tr:nth-child(even) {
+            background-color:#347aeb;
+          }
+          tr:nth-child(odd) {
+            background-color:#348feb;
+          }
+          select {
+            width: 200px;
+            height:30px;
+            background-color:#969287;
+          }
+      
+          /* Change the color of the button to green */
+          button {
+            background-color: green;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            cursor: pointer;
+            border-radius:8px;
+          }
+      
+          /* Add hover effect to the button */
+          button:hover {
+            background-color: darkgreen;
+          }
+         #dlt_btn{
+            text-decoration:none;
+            background-color:red;
+            color:white;
+            border-radius:3px;
+         }
+         #delete_btn{
+            background-color:black;
+           
+         }
+         #delete_heading{
+            background-color:grey;
+         }
+         #progress_bar{
+            width:40%;
+            background-color:grey;
+            height:10px;
+            margin-left:80px;
+            border-radius:20px;
+         }
+         #bar_graph{
+            width:0%;
+            
+            height:100%;
+            border-radius:20px;
+         }
+         #progress_heading{
+            margin-left:60px;
+            color:white;
+         }
+         #cal_percentage{
+            width:50%;
+            color:white;
+            margin-left:50px;
+            margin-top:10px;
+            font-size:30px;
+         }
+         #myChart{
+          height:400px;
+          width:400px;
+          margin-top:20px;
+         }
+         #chart_graph{
+          display:flex;
+          flex-direction:column;
+          
+         }
+         #main_container{
+         display:flex;
+         justify-content:space-evenly;
+         }
+         #login_name{
+          color:black;
+          background-color:#f2f7f7;
+          border-radius:8px;
+          padding:10px;
+          margin-left:5px;
+         }
+         #logout_name{
+          color:#f2f7f7;
+          background-color:red;
+          border-radius:8px;
+          padding:10px;
+         }
+         #welcome{
+          color:white;
+          font-style:bold;
+          font-family:cursive;
+          font-size:20px;
+         }
+         #progresscalorie{
+          margin-left:20px;
+         }
+         #nutri{
+          background-color:#295bd5;
+          text-align:center;
+          color:white;
+          font-size:50px;
+         }
+         #weight{
+          margin-top:50px;
+          margin-left:190px;
+         }
+         #weight_select{
+          width: 200px;
+          height:30px;
+          background-color:#969287;
+         }
+         #weight_btn{
+          background-color:yellow;
+          color:black;
+          font-style:bold;
+          padding: 10px 15px;
+          border: none;
+          cursor: pointer;
+          border-radius:8px;
+         }
+         h3{
+          color:white;
+          margin-left:100px;
+         }
+        </style>
+      </head>
+    <body>
+      <div class="navbar">
+        <div class="logo">
+            <img src="https://pics.craiyon.com/2023-10-12/5160b89df4984fb9baacfff3a4c95f14.webp" alt="C Tracker Logo">
+            <span>Calorie Tracker</span>
+        </div>
+        <ul class="nav-list">
+            {% if user.is_authenticated %}
+            <li id="li_name"><span id="welcome">Welcome</span><a id="login_name" href="#">{{user.username}}</a></li>
+           
+            <li><a href="{% url 'logout' %}" id="logout_name">Log out</a></li>
+            {%endif%}
+            
+        </ul>
+    </div>
+    
+          <div id="form_data">
+       <form method="POST">
+        {% csrf_token %}
+        <select name="food_consumed" id="food_consumed">
+            {% for f in foods %}
+            <option value="{{f.name}}">{{f.name}}</option>
+            {%endfor%}  
+        </select>
+        <button type="submit">Add</button>     
+        </form>
+      
+    </div>
+   
+    <div id="main_container">
+      <div id="part1">
+    <table id="table">
+        <tr>
+          <th>Items</th>
+          <th>Carbs(in gms)</th>
+          <th>Protein(in gms)</th>
+          <th>Fats(in gms)</th>
+          <th>Calories(in Kcal)</th>
+          <th id="delete_heading">Delete item</th>
+{% for c in cons_food %}
+  <tr>
+    <td>{{ c.food_consumed.name }}</td>
+    <td>{{ c.food_consumed.carbs }}</td>
+    <td>{{ c.food_consumed.protein }}</td>
+    <td>{{ c.food_consumed.fats}}</td>
+    <td>{{ c.food_consumed.calories }}</td>
+    <td id="delete_btn"><a id="dlt_btn" href="{% url 'delete' c.id %}">Delete</a></td>
+  </tr>
+{%endfor%}
+  <tr>
+    <td id="name"><b>Total</b></td>
+    <td id="totalCarbs"><b></b></td>
+    <td id="totalProtein"><b></b></td>
+    <td id="totalFats"><b></b></td>
+    <td id="totalCalories"><b></b></td>
+  </tr>  
+      </table>
+
+</div>
+
+<div id="chart_graph">
+  <div>
+  <div id="nutri">Macro nutrients</div>
+  <canvas id="myChart"></canvas>
+  </div>
+  <div id="progresscalorie">
+  <h2 id="progress_heading">Calorie Progress</h2>
+  <div id="progress_bar">
+    <div id="bar_graph"></div>
+    <div id="cal_percentage"></div>
+</div>
+</div>
+</div>
+</div>
+    </body>
+    <script>
+        var table=document.getElementById("table")
+        var carbs=0,protein=0,fats=0,calories=0;
+        for(let i=1;i<table.rows.length-1;i++){
+        carbs+=parseFloat(table.rows[i].cells[1].innerHTML);
+        protein+=parseFloat(table.rows[i].cells[2].innerHTML);
+        fats+=parseFloat(table.rows[i].cells[3].innerHTML);
+        calories+=parseFloat(table.rows[i].cells[4].innerHTML);
+        }
+        carbs=carbs.toFixed(2);
+        protein=protein.toFixed(2);
+        fats=fats.toFixed(2);
+        calories=calories.toFixed(2);
+        document.getElementById("totalCarbs").innerHTML=carbs;
+        document.getElementById("totalProtein").innerHTML=protein;
+        document.getElementById("totalFats").innerHTML=fats;
+        document.getElementById("totalCalories").innerHTML=calories
+      
+
+
+        var calPer=(calories/2000)*100;
+        console.log(calPer)
+        if(calPer>100){
+            calPer=100;
+        }
+        calPer=calPer.toFixed(0);
+       
+        document.getElementById("bar_graph").setAttribute("style","width:"+calPer+"%");
+        document.getElementById("cal_percentage").innerHTML=calPer+"%";
+        if(calPer<=50){
+            var par= document.querySelector('#bar_graph');
+           par.style.backgroundColor='red';
+           console.log("true");
+        }else if(calPer>50 && calPer<=79){
+            var par= document.querySelector('#bar_graph');
+            par.style.backgroundColor='yellow';
+        }else if(calPer>=80 && calPer<=100){
+            var par= document.querySelector('#bar_graph');
+            par.style.backgroundColor='green';
+        }
+        carbs=parseFloat(carbs);
+        protein=parseFloat(protein);
+        fats=parseFloat(fats);
+        var total=Math.round(carbs+protein+fats);
+        var carbs_p=Math.round((carbs/total)*100);
+        var protein_p=Math.round((protein/total)*100);
+        var fats_p=Math.round((fats/total)*100);
+        
+        const ctx = document.getElementById('myChart');
+
+        new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: ['Carbs '+carbs_p+"%", 'Protein '+protein_p+"%", 'Fats '+fats_p+"%"],
+            datasets: [{
+              label: '% consumed',
+              data: [carbs_p, protein_p, fats_p],
+              backgroundColor: [
+                'rgba(232, 118, 151)',  // Background color for Item 1
+                'rgba(227, 34, 57)', // Background color for Item 2
+                'rgba(166, 8, 35)' // Background color for Item 3  
+            ],
+              borderWidth: 1,
+            }]
+          },
+         
+        });
+      </script>
+</html>
